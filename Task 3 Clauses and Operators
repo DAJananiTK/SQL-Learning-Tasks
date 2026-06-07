@@ -1,5 +1,5 @@
 Database: ECommerceDB
-________________________________________
+
 Question 1: ORDER BY & LIMIT
 Scenario:
 Management wants to see the top 3 highest-priced products in the e-commerce system.
@@ -9,42 +9,8 @@ Task:
 •	Use a LIMIT clause (or equivalent in SQL Server: TOP) to restrict to 3 products.
 Expected Output:
 Top 3 products with their product_id, product_name, and price.
-________________________________________
-Question 2: Aggregate Functions
-Scenario:
-Management wants summary statistics of the sales data.
-Task:
-•	Write SQL queries using aggregate functions on the Sales table:
-o	COUNT() → total number of sales records
-o	SUM() → total sales amount
-o	AVG() → average sale amount
-o	MAX() → highest sale amount
-o	MIN() → lowest sale amount
-Expected Output:
-Aggregated results showing total sales, average sale amount, highest and lowest sale amounts.
-________________________________________
-Question 3: GROUP BY & HAVING
-Scenario:
-Management wants to know which products have total sales amount greater than ₹100.
-Task:
-•	Use GROUP BY on product_id (or product_name) to calculate total sales per product.
-•	Use HAVING to filter products with total sales > 100.
-Expected Output:
-List of products with product_id, product_name, and total sales amount greater than ₹100.
-________________________________________
-Question 4: Window Functions
-Scenario:
-Management wants a ranking of products based on their prices.
-Task:
-•	Write a SQL query using a Window Function (RANK() or DENSE_RANK()) to rank products.
-•	Rank products from highest to lowest price.
-Expected Output:
-Each product with product_id, product_name, price, and rank according to price.
 
 
-
-
-ANSWERS:
 CREATE DATABASE ECommerceDB;
 USE ECommerceDB;
 
@@ -92,12 +58,42 @@ select * from product;
 -- order by and limit --
 select * from product order by price desc limit 3;  -- Top 3 products --
 
+
+
+Question 2: Aggregate Functions
+Scenario:
+Management wants summary statistics of the sales data.
+Task:
+•	Write SQL queries using aggregate functions on the Sales table:
+o	COUNT() → total number of sales records
+o	SUM() → total sales amount
+o	AVG() → average sale amount
+o	MAX() → highest sale amount
+o	MIN() → lowest sale amount
+Expected Output:
+Aggregated results showing total sales, average sale amount, highest and lowest sale amounts.
+
+
+
 -- aggregation functions--
 select count(distinct sale_id) from sales;
 select sum(sale_amount) from sales;
 select avg(sale_amount) from sales;
 select max(sale_amount) from sales;
 select min(sale_amount) from sales;
+
+
+
+
+Question 3: GROUP BY & HAVING
+Scenario:
+Management wants to know which products have total sales amount greater than ₹100.
+Task:
+•	Use GROUP BY on product_id (or product_name) to calculate total sales per product.
+•	Use HAVING to filter products with total sales > 100.
+Expected Output:
+List of products with product_id, product_name, and total sales amount greater than ₹100.
+
 
 -- group by and having clause --
 
@@ -108,7 +104,27 @@ FROM Sales
 GROUP BY product_id
 HAVING total_sales > 100;
 
+
+
+Question 4: Window Functions
+Scenario:
+Management wants a ranking of products based on their prices.
+Task:
+•	Write a SQL query using a Window Function (RANK() or DENSE_RANK()) to rank products.
+•	Rank products from highest to lowest price.
+Expected Output:
+Each product with product_id, product_name, price, and rank according to price.
+
+
 -- window functions --
 select product_id,product_name,price ,rank() over(order by price desc) as Rank_given from product;
 select product_id,product_name,price ,dense_rank() over(order by price desc) as Rank_given from product;
+
+
+
+
+
+
+
+
 
