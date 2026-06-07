@@ -1,0 +1,308 @@
+CREATE DATABASE SQL_COMPANY_DB;
+USE SQL_COMPANY_DB;
+
+
+-- 1. DEPARTMENTS
+
+CREATE TABLE Departments (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50)
+);
+
+INSERT INTO Departments VALUES
+(1,'HR'),
+(2,'IT'),
+(3,'Finance'),
+(4,'Sales'),
+(5,'Marketing');
+
+
+-- 2. EMPLOYEES
+
+CREATE TABLE Employees (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    dept_id INT,
+    salary DECIMAL(10,2),
+    city VARCHAR(50)
+);
+
+INSERT INTO Employees VALUES
+(101,'Arun',2,55000,'Chennai'),
+(102,'Bala',2,60000,'Madurai'),
+(103,'Anitha',1,45000,'Trichy'),
+(104,'David',3,NULL,'Coimbatore'),
+(105,'Asha',4,70000,'Madurai'),
+(106,'John',NULL,50000,'Salem'),
+(107,'Kavin',4,80000,'Chennai'),
+(108,'Meena',5,65000,'Madurai'),
+(109,'Priya',2,60000,'Trichy'),
+(110,'Ravi',4,80000,'Madurai');
+
+
+-- 3. CUSTOMERS
+-- Includes duplicates
+
+CREATE TABLE Customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(50),
+    email VARCHAR(100),
+    city VARCHAR(50)
+);
+
+INSERT INTO Customers VALUES
+(1,'Raj','raj@gmail.com','Madurai'),
+(2,'Kumar','kumar@gmail.com','Chennai'),
+(3,'Divya','divya@gmail.com','Madurai'),
+(4,'Raj','raj@gmail.com','Madurai'),
+(5,'Sneha','sneha@gmail.com','Trichy'),
+(6,'Vijay','vijay@gmail.com','Chennai'),
+(7,'Rani','rani@gmail.com','Madurai'),
+(8,'Arun','arun@gmail.com','Salem');
+
+-- 4. PRODUCTS
+
+CREATE TABLE Products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(50),
+    category VARCHAR(50),
+    price DECIMAL(10,2)
+);
+
+INSERT INTO Products VALUES
+(201,'Laptop','Electronics',55000),
+(202,'Mobile','Electronics',25000),
+(203,'Shoes','Fashion',3000),
+(204,'Watch','Accessories',5000),
+(205,'Tablet','Electronics',35000);
+
+-- 5. ORDERS
+
+CREATE TABLE Orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    product_id INT,
+    order_date DATE,
+    quantity INT
+);
+
+INSERT INTO Orders VALUES
+(1001,1,201,'2025-01-10',1),
+(1002,2,202,'2025-01-15',2),
+(1003,1,203,'2025-02-05',3),
+(1004,3,204,'2025-02-12',1);
+
+
+
+-- Scenario based questions 
+-- 1.	Find duplicate customer records from the Customers table 
+
+SELECT customer_name, email, COUNT(*) AS duplicate_count
+FROM Customers
+GROUP BY customer_name, email
+HAVING COUNT(*) > 1;
+
+
+--2.	Replace NULL salaries with 0 in the Employees table. 
+
+SELECT emp_id, emp_name,             (Without changing data)
+       IFNULL(salary, 0) AS salary
+FROM Employees;        
+
+
+UPDATE Employees                      (Permanenet update in database)
+SET salary = 0
+WHERE salary IS NULL;
+
+
+3.	Fetch the top 5 highest-paid employees. 
+
+SELECT emp_id, emp_name, salary
+FROM Employees
+ORDER BY salary DESC
+LIMIT 5;
+
+
+4.	Display employees whose names start with letter A. 
+
+SELECT emp_id, emp_name, salary, city
+FROM Employees
+WHERE emp_name LIKE 'A%';
+
+
+5.	Show all orders placed between two given dates. 
+SELECT *
+FROM Orders
+WHERE order_date BETWEEN '2025-01-01' AND '2025-02-01';     -- (january 1 to february 1)
+
+
+6.	Show employee names along with department names. 
+SELECT 
+    e.emp_name,
+    d.dept_name
+FROM Employees e
+INNER JOIN Departments d
+ON e.dept_id = d.dept_id;
+
+
+7.	Find employees who are not assigned to any department. 
+
+SELECT e.emp_name
+FROM Employees e
+LEFT JOIN Departments d
+ON e.dept_id = d.dept_id
+WHERE e.dept_id IS NULL;
+
+
+8.	Show all departments even if no employees are assigned. 
+SELECT 
+    d.dept_id,
+    d.dept_name,
+    e.emp_name
+FROM Departments d
+LEFT JOIN Employees e
+ON d.dept_id = e.dept_id;
+
+
+9.	Find records present in one table but missing in another table. 
+SELECT e.*   -- employees not having a department
+FROM Employees e
+LEFT JOIN Departments d
+ON e.dept_id = d.dept_id
+WHERE d.dept_id IS NULL;
+
+SELECT d.*     -- departments with no employees
+FROM Departments d
+LEFT JOIN Employees e
+ON d.dept_id = e.dept_id
+WHERE e.emp_id IS NULL;
+
+
+10.	Show customers who placed orders and customers who did not place orders. 
+
+
+SELECT  distinct c.customer_name -- customer who placed orders
+FROM Customers c
+INNER JOIN Orders o
+ON c.customer_id = o.customer_id;
+
+SELECT  c.customer_name  -- customer who not placed orders
+FROM Customers c
+LEFT JOIN Orders o
+ON c.customer_id = o.customer_id
+WHERE o.customer_id IS NULL;
+
+
+-- 11.	Calculate total sales month-wise from orders and products table
+
+SELECT
+    MONTH(o.order_date) AS Month,
+    SUM(o.quantity * p.price) AS Total_Sales
+FROM Orders o
+JOIN Products p
+ON o.product_id = p.product_id
+GROUP BY MONTH(o.order_date)
+ORDER BY Month;
+
+
+-- 12.	Find average salary department-wise. 
+
+select 
+d.dept_name ,
+avg(e.salary) as Avg_Salary
+from 
+employees e 
+inner join
+departments d 
+on e.dept_id=d.dept_id
+group by d.dept_name;
+
+
+-- 13.	Find which department has the maximum number of employees. 
+select d.dept_name ,
+count(e.emp_id) as Employee_count
+from departments d 
+inner join employees e 
+on d.dept_id=e.dept_id
+group by d.dept_name
+order by Employee_count desc
+limit 1;
+
+
+-- 14.	Find the second highest salary in the Employees table. 
+select distinct salary  from employees
+order by salary desc 
+limit 1 offset 1
+
+
+-- 15.	Find duplicate emails in the Customers table. 
+SELECT 
+    email,
+    COUNT(*) AS duplicate_count
+FROM Customers
+GROUP BY email
+HAVING COUNT(*) > 1;
+
+
+-- 16.	Compare this month sales with last month sales. 
+
+SELECT
+    MONTH(o.order_date) AS month_no,
+    SUM(o.quantity * p.price) AS total_sales,
+    LAG(SUM(o.quantity * p.price))
+        OVER (ORDER BY MONTH(o.order_date)) AS previous_month_sales
+FROM Orders o
+JOIN Products p
+ON o.product_id = p.product_id
+GROUP BY MONTH(o.order_date);
+
+
+-- 17.	Find top 3 products by revenue. 
+
+SELECT
+    p.product_name,
+    SUM(o.quantity * p.price) AS revenue
+FROM Orders o
+JOIN Products p
+ON o.product_id = p.product_id
+GROUP BY  p.product_name
+ORDER BY revenue DESC
+LIMIT 3;
+
+
+-- 18.	Find which city has the highest number of customers. 
+SELECT 
+    city,
+    COUNT(*) AS customer_count
+FROM Customers
+GROUP BY city
+ORDER BY customer_count DESC
+LIMIT 1;
+
+
+-- 19.	Find customers who purchased more than 5 times. 
+
+select c.customer_name ,count(o.order_id) as order_count from customers c join
+orders o on 
+c.customer_id=o.customer_id 
+group by c.customer_name having count(o.order_id)>5;
+
+
+-- 20.	Find inactive customers who have not ordered in the last 6 months. 
+SELECT 
+    c.customer_id,
+    c.customer_name
+FROM Customers c
+LEFT JOIN Orders o
+ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.customer_name
+HAVING MAX(o.order_date) < DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+       OR MAX(o.order_date) IS NULL;
+
+
+
+
+
+
+
+
