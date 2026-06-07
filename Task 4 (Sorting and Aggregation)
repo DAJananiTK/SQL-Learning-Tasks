@@ -1,5 +1,8 @@
+
 DAY 4: SQL CODING CHALLENGE – SORTING & AGGREGATES 🛒
 Database: ECommerceDB (refer db creation steps in task 3)
+
+
 Question 1: ORDER BY
 Scenario:
 List all products sorted by price descending.
