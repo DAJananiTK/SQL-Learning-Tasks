@@ -1,5 +1,5 @@
 DAY 4: SQL CODING CHALLENGE – SORTING & AGGREGATES 🛒
-Database: ECommerceDB
+Database: ECommerceDB (refer db creation steps in task 3)
 Question 1: ORDER BY
 Scenario:
 List all products sorted by price descending.
@@ -7,7 +7,13 @@ Task:
 Use ORDER BY to sort products from highest to lowest price.
 Expected Output:
 product_id, product_name, price sorted descending.
-________________________________________
+
+
+
+-- order by --
+select product_id,product_name,price from product order by price desc;
+
+
 Question 2: ORDER BY with LIMIT
 Scenario:
 Show the top 3 most expensive products.
@@ -15,7 +21,11 @@ Task:
 Use ORDER BY with LIMIT to display only the top 3 products.
 Expected Output:
 product_id, product_name, price of top 3 products.
-________________________________________
+
+-- order by with limit --
+select product_id,product_name ,price from product order by price desc limit 3;
+
+
 Question 3: Aggregate Functions – Total Sales
 Scenario:
 Find the total sales amount across all sales.
@@ -23,7 +33,13 @@ Task:
 Use SUM() on sale_amount.
 Expected Output:
 A single value showing total sales.
-________________________________________
+
+
+
+-- Aggregate functions (Total Sales) --
+select sum(sale_amount) as Total_Sales from sales;
+
+
 Question 4: Aggregate Functions – Average Price
 Scenario:
 Find the average sale amount from the Sales table.
@@ -31,7 +47,15 @@ Task:
 Use AVG() on sale_amount.
 Expected Output:
 Average sale amount of all records.
-________________________________________
+
+
+ 
+ -- Aggregate functions (average sales)--
+ select avg(sale_amount) Average_Sale from sales;
+
+
+
+
 Question 5: Aggregate Functions – Count & Max/Min
 Scenario:
 •	Count total number of sales.
@@ -40,7 +64,19 @@ Task:
 Use COUNT(), MAX(), MIN() on sale_amount.
 Expected Output:
 Total sales count, highest and lowest sale amount.
-________________________________________
+
+
+
+--  Aggregate Functions – Count & Max/Min
+
+SELECT 
+    COUNT(*) AS Total_Sales,
+    MAX(sale_amount) AS Highest_Sale_Amount,
+    MIN(sale_amount) AS Lowest_Sale_Amount
+FROM Sales;
+
+
+
 Question 6: GROUP BY – Total Sales per Product
 Scenario:
 Find total sales amount per product.
@@ -48,7 +84,16 @@ Task:
 Use GROUP BY product_id (and optionally product_name) and SUM(sale_amount).
 Expected Output:
 product_id, product_name, total sales amount per product.
-________________________________________
+
+
+
+ 
+ -- Group by (Total sales per product)--
+ select product_id,sum(sale_amount) Total_sale_amount from sales group by product_id;
+
+
+
+
 Question 7: GROUP BY with HAVING
 Scenario:
 List products whose total sales exceed ₹50,000.
@@ -56,7 +101,14 @@ Task:
 Use GROUP BY and HAVING SUM(sale_amount) > 50000.
 Expected Output:
 product_id, product_name, total sales amount for products meeting the condition.
-________________________________________
+
+
+-- Group by with having --
+ select product_id,sum(sale_amount) Total_sale_amount from sales group by product_id having Total_sale_amount>50000;
+
+
+
+
 Question 8: ORDER BY with GROUP BY
 Scenario:
 Show total sales per product, sorted descending by total sales.
@@ -64,7 +116,13 @@ Task:
 Use GROUP BY on product_id and ORDER BY SUM(sale_amount) DESC.
 Expected Output:
 Products with total sales sorted from highest to lowest.
-________________________________________
+
+-- Order by with group by --
+select product_id,sum(sale_amount) Total_sale_amount from sales group by product_id order by Total_sale_amount desc;
+
+
+
+
 Question 9: LIMIT with GROUP BY
 Scenario:
 Find the top 3 products by total sales amount.
@@ -72,7 +130,13 @@ Task:
 Use GROUP BY product_id, aggregate with SUM(sale_amount), sort descending, and limit to 3 rows.
 Expected Output:
 product_id, product_name, total sales amount of top 3 products.
-________________________________________
+
+
+-- Limit with group by-- (top  3 products)
+
+select product_id,sum(sale_amount) Total_sale_amount from sales group by product_id order by Total_sale_amount desc limit 3;
+
+
 Question 10: HAVING with Aggregate Condition
 Scenario:
 Show products with total sales > ₹30,000 AND average sale amount > ₹10,000.
@@ -81,36 +145,23 @@ Use GROUP BY product_id and HAVING SUM(sale_amount) > 30000 AND AVG(sale_amount)
 Expected Output:
 product_id, product_name, total sales, average sale amount for products meeting the criteria.
 
-
-ANSWERS:
-
-
-
--- order by --
-select product_id,product_name,price from product order by price desc;
-
--- order by with limit --
-select product_id,product_name ,price from product order by price desc limit 3;
-
--- Aggregate functions (Total Sales) --
-select sum(sale_amount) as Total_Sales from sales;
- 
- -- Aggregate functions (average sales)--
- select avg(sale_amount) Average_Sale from sales;
- 
- -- Group by (Total sales per product)--
- select product_id,sum(sale_amount) Total_sale_amount from sales group by product_id;
- 
- -- Group b y with having --
- select product_id,sum(sale_amount) Total_sale_amount from sales group by product_id having Total_sale_amount>50000;
-
-
--- Order by with group by --
-select product_id,sum(sale_amount) Total_sale_amount from sales group by product_id order by Total_sale_amount desc;
-
--- Limit with group by-- (top  3 products)
-
-select product_id,sum(sale_amount) Total_sale_amount from sales group by product_id order by Total_sale_amount desc limit 3;
-
 -- Having with Aggregation Condition --
 select product_id,sum(sale_Amount) Total_sales,avg(sale_amount) average_sales from sales group by product_id having Total_sales>30000 and average_sales>10000;
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+
+
+
+
+
