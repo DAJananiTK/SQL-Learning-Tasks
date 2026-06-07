@@ -6,37 +6,6 @@ Scenario: Create a table named Patients with the following fields:
 PatientID, PatientName, Age, Gender, AdmissionDate.
 
 
-Question 2: ALTER – Add Column
-Scenario: Add a new column DoctorAssigned VARCHAR(50) to the Patients table.
-
-
-Question 3: ALTER – Modify Column
-Scenario: Increase the length of PatientName from VARCHAR(50) to VARCHAR(100).
-
-
-Question 4: RENAME Table
-Scenario: Rename the table Patients to Patient_Info.
-
-
-Question 5: TRUNCATE vs DROP
-Scenario:
-At year-end, delete all patient records but keep the table. Later, remove it permanently.
-Expected Output:
-•    TRUNCATE keeps the structure but clears data.
-•    DROP removes the table completely.
-
-
-
-
-
-
-
-
-
-Answers:
-
-
-
 create database hospital_db;
 use hospital_db;
 create table patients (
@@ -46,10 +15,54 @@ age int,
 gender varchar(10),
 admission_Date date
 );
+
+
+
+
+Question 2: ALTER – Add Column
+Scenario: Add a new column DoctorAssigned VARCHAR(50) to the Patients table.
+
 alter table patients
 add doctor_assigned varchar(50);
+
+
+
+
+Question 3: ALTER – Modify Column
+Scenario: Increase the length of PatientName from VARCHAR(50) to VARCHAR(100).
+
 alter table patients
 modify patientName varchar(100);
+
+
+Question 4: RENAME Table
+Scenario: Rename the table Patients to Patient_Info.
+
 rename table patients to patients_info;
+
+
+Question 5: TRUNCATE vs DROP
+Scenario:
+At year-end, delete all patient records but keep the table. Later, remove it permanently.
+Expected Output:
+•    TRUNCATE keeps the structure but clears data.
+•    DROP removes the table completely.
+
 truncate table patients_info;
 drop table patients_info;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
