@@ -101,7 +101,7 @@ SELECT customer_name, email, COUNT(*) AS duplicate_count
 FROM Customers
 GROUP BY customer_name, email
 HAVING COUNT(*) > 1;
-
+output-- raj is the duplicate record
 
 --2.	Replace NULL salaries with 0 in the Employees table. 
 
@@ -112,7 +112,8 @@ FROM Employees;
 
 UPDATE Employees                      (Permanenet update in database)
 SET salary = 0
-WHERE salary IS NULL;
+WHERE salary IS NULL;        
+output--  104 David salary got updated to 0.00
 
 
 3.	Fetch the top 5 highest-paid employees. 
@@ -121,6 +122,13 @@ SELECT emp_id, emp_name, salary
 FROM Employees
 ORDER BY salary DESC
 LIMIT 5;
+output--
+107 Kavin
+110 Ravi
+105 Asha
+108 Meena
+102 Bala
+
 
 
 4.	Display employees whose names start with letter A. 
@@ -129,12 +137,22 @@ SELECT emp_id, emp_name, salary, city
 FROM Employees
 WHERE emp_name LIKE 'A%';
 
+output--
+101 Arun
+103 Anitha
+105 Asha
+
 
 5.	Show all orders placed between two given dates. 
 SELECT *
 FROM Orders
 WHERE order_date BETWEEN '2025-01-01' AND '2025-02-01';     -- (january 1 to february 1)
 
+
+output-- 
+From January 1 to February 1 two orders are there with two order id's
+1001
+1002
 
 6.	Show employee names along with department names. 
 SELECT 
@@ -144,6 +162,17 @@ FROM Employees e
 INNER JOIN Departments d
 ON e.dept_id = d.dept_id;
 
+output--
+Arun	IT
+Bala	IT
+Anitha	HR
+David	Finance
+Asha	Sales
+Kavin	Sales
+Meena	Marketing
+Priya	IT
+Ravi	Sales
+
 
 7.	Find employees who are not assigned to any department. 
 
@@ -152,6 +181,9 @@ FROM Employees e
 LEFT JOIN Departments d
 ON e.dept_id = d.dept_id
 WHERE e.dept_id IS NULL;
+
+output--
+John
 
 
 8.	Show all departments even if no employees are assigned. 
@@ -163,6 +195,17 @@ FROM Departments d
 LEFT JOIN Employees e
 ON d.dept_id = e.dept_id;
 
+output--
+1	HR	     Anitha
+2	IT	     Priya
+2	IT	     Bala
+2	IT	     Arun
+3	Finance	 David
+4	Sales	 Ravi
+4	Sales	 Kavin
+4	Sales	 Asha
+5	Marketing Meena
+
 
 9.	Find records present in one table but missing in another table. 
 SELECT e.*   -- employees not having a department
@@ -170,6 +213,8 @@ FROM Employees e
 LEFT JOIN Departments d
 ON e.dept_id = d.dept_id
 WHERE d.dept_id IS NULL;
+output-- 
+106	John		50000.00	Salem  
 
 SELECT d.*     -- departments with no employees
 FROM Departments d
@@ -177,6 +222,8 @@ LEFT JOIN Employees e
 ON d.dept_id = e.dept_id
 WHERE e.emp_id IS NULL;
 
+output--
+no values because all departments have employees
 
 10.	Show customers who placed orders and customers who did not place orders. 
 
@@ -186,11 +233,23 @@ FROM Customers c
 INNER JOIN Orders o
 ON c.customer_id = o.customer_id;
 
+output--
+Raj
+Kumar
+Divya
+
 SELECT  c.customer_name  -- customer who not placed orders
 FROM Customers c
 LEFT JOIN Orders o
 ON c.customer_id = o.customer_id
 WHERE o.customer_id IS NULL;
+
+output--
+Raj
+Sneha
+Vijay
+Rani
+Arun
 
 
 -- 11.	Calculate total sales month-wise from orders and products table
@@ -203,6 +262,9 @@ JOIN Products p
 ON o.product_id = p.product_id
 GROUP BY MONTH(o.order_date)
 ORDER BY Month;
+output--
+1	105000.00
+2	14000.00
 
 
 -- 12.	Find average salary department-wise. 
@@ -217,6 +279,15 @@ departments d
 on e.dept_id=d.dept_id
 group by d.dept_name;
 
+output--
+IT	58333.333333
+HR	45000.000000
+Finance	
+Sales	76666.666667
+Marketing	65000.000000
+
+
+
 
 -- 13.	Find which department has the maximum number of employees. 
 select d.dept_name ,
@@ -228,11 +299,17 @@ group by d.dept_name
 order by Employee_count desc
 limit 1;
 
+output--
+IT	3
+
 
 -- 14.	Find the second highest salary in the Employees table. 
 select distinct salary  from employees
 order by salary desc 
 limit 1 offset 1
+
+output--
+70000.00
 
 
 -- 15.	Find duplicate emails in the Customers table. 
@@ -242,6 +319,9 @@ SELECT
 FROM Customers
 GROUP BY email
 HAVING COUNT(*) > 1;
+
+output--
+raj@gmail.com	2
 
 
 -- 16.	Compare this month sales with last month sales. 
@@ -256,6 +336,10 @@ JOIN Products p
 ON o.product_id = p.product_id
 GROUP BY MONTH(o.order_date);
 
+output--
+1	105000.00	
+2	14000.00	105000.00
+
 
 -- 17.	Find top 3 products by revenue. 
 
@@ -269,6 +353,11 @@ GROUP BY  p.product_name
 ORDER BY revenue DESC
 LIMIT 3;
 
+output--
+Laptop	55000.00
+Mobile	50000.00
+Shoes	9000.00
+
 
 -- 18.	Find which city has the highest number of customers. 
 SELECT 
@@ -279,6 +368,9 @@ GROUP BY city
 ORDER BY customer_count DESC
 LIMIT 1;
 
+output--
+Madurai	4
+
 
 -- 19.	Find customers who purchased more than 5 times. 
 
@@ -286,6 +378,9 @@ select c.customer_name ,count(o.order_id) as order_count from customers c join
 orders o on 
 c.customer_id=o.customer_id 
 group by c.customer_name having count(o.order_id)>5;
+
+output--
+no one had purchased more than 5 items
 
 
 -- 20.	Find inactive customers who have not ordered in the last 6 months. 
@@ -298,6 +393,16 @@ ON c.customer_id = o.customer_id
 GROUP BY c.customer_id, c.customer_name
 HAVING MAX(o.order_date) < DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
        OR MAX(o.order_date) IS NULL;
+
+output--
+1	Raj
+2	Kumar
+3	Divya
+4	Raj
+5	Sneha
+6	Vijay
+7	Rani
+8	Arun
 
 
 
