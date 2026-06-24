@@ -93,6 +93,68 @@ INSERT INTO Orders VALUES
 (1004,3,204,'2025-02-12',1);
 
 
+-- 6 SALES
+
+
+CREATE TABLE Sales (
+    sale_id INT PRIMARY KEY,
+    order_date DATE,
+    product_id INT,
+    amount DECIMAL(10,2)
+);
+
+INSERT INTO Sales VALUES
+(1,'2025-01-10',201,55000),
+(2,'2025-01-15',202,50000),
+(3,'2025-02-05',203,9000),
+(4,'2025-02-12',204,5000),
+(5,'2025-03-01',202,25000),
+(6,'2025-03-10',201,55000),
+(7,'2025-04-05',205,35000),
+(8,'2025-04-15',202,50000),
+(9,'2025-05-01',204,5000),
+(10,'2025-05-12',203,6000),
+(11,'2025-06-01',202,25000),
+(12,'2025-06-15',203,3000);
+
+
+-- 7. MONTHLY SALES
+
+CREATE TABLE MonthlySales (
+    month VARCHAR(20),
+    sales DECIMAL(10,2)
+);
+
+INSERT INTO MonthlySales VALUES
+('Jan',105000),
+('Feb',14000),
+('Mar',80000),
+('Apr',85000),
+('May',11000),
+('Jun',28000);
+
+
+
+
+-- 8. SALES TEAM
+
+CREATE TABLE SalesTeam (
+    emp_name VARCHAR(50),
+    region VARCHAR(50),
+    sales DECIMAL(10,2)
+);
+
+INSERT INTO SalesTeam VALUES
+('Arun','South',80000),
+('Bala','South',90000),
+('Divya','North',70000),
+('John','North',95000),
+('Meena','East',60000),
+('Priya','East',75000),
+('Ravi','West',85000),
+('Kavin','West',92000);
+
+
 
 -- Scenario based questions 
 -- 1.	Find duplicate customer records from the Customers table 
@@ -101,6 +163,9 @@ SELECT customer_name, email, COUNT(*) AS duplicate_count
 FROM Customers
 GROUP BY customer_name, email
 HAVING COUNT(*) > 1;
+
+
+
 output-- raj is the duplicate record
 
 --2.	Replace NULL salaries with 0 in the Employees table. 
@@ -113,6 +178,9 @@ FROM Employees;
 UPDATE Employees                      (Permanenet update in database)
 SET salary = 0
 WHERE salary IS NULL;        
+
+
+
 output--  104 David salary got updated to 0.00
 
 
@@ -122,6 +190,8 @@ SELECT emp_id, emp_name, salary
 FROM Employees
 ORDER BY salary DESC
 LIMIT 5;
+
+
 output--
 107 Kavin
 110 Ravi
@@ -213,6 +283,8 @@ FROM Employees e
 LEFT JOIN Departments d
 ON e.dept_id = d.dept_id
 WHERE d.dept_id IS NULL;
+
+
 output-- 
 106	John		50000.00	Salem  
 
@@ -222,8 +294,10 @@ LEFT JOIN Employees e
 ON d.dept_id = e.dept_id
 WHERE e.emp_id IS NULL;
 
+
 output--
 no values because all departments have employees
+
 
 10.	Show customers who placed orders and customers who did not place orders. 
 
@@ -262,6 +336,8 @@ JOIN Products p
 ON o.product_id = p.product_id
 GROUP BY MONTH(o.order_date)
 ORDER BY Month;
+
+
 output--
 1	105000.00
 2	14000.00
@@ -404,6 +480,299 @@ output--
 7	Rani
 8	Arun
 
+-- Window function Scenarios      
+-- 21.	Rank employees based on salary. 
+
+SELECT emp_id,
+       emp_name,
+       salary,
+       RANK() OVER (ORDER BY salary DESC) AS salary_rank
+FROM Employees;
+
+
+output
+107	Kavin	80000.00	1
+110	Ravi	80000.00	1
+105	Asha	70000.00	3
+108	Meena	65000.00	4
+102	Bala	60000.00	5
+109	Priya	60000.00	5
+101	Arun	55000.00	7
+106	John	50000.00	8
+103	Anitha	45000.00	9
+104	David		        10
+
+
+-- 22.	Calculate running total of sales by date. 
+SELECT order_date,
+       amount,
+       SUM(amount) OVER (ORDER BY order_date) AS running_total
+FROM Sales;
+
+
+output
+2025-01-10	55000.00	 55000.00
+2025-01-15	50000.00	 105000.00
+2025-02-05	9000.00	     114000.00
+2025-02-12	5000.00	     119000.00
+2025-03-01	25000.00	 144000.00
+2025-03-10	55000.00	 199000.00
+2025-04-05	35000.00	 234000.00
+2025-04-15	50000.00	 284000.00
+2025-05-01	5000.00	     289000.00
+2025-05-12	6000.00	     295000.00
+2025-06-01	25000.00	 320000.00
+2025-06-15	3000.00	     323000.00
+
+-- 23.	Show previous month sales using LAG() function. 
+SELECT month,
+       sales,
+       LAG(sales) OVER (
+           ORDER BY FIELD(month,'Jan','Feb','Mar','Apr','May','Jun')
+       ) AS previous_month_sales
+FROM MonthlySales;
+
+
+output
+
+Jan	105000.00	
+Feb	14000.00	105000.00
+Mar	80000.00	14000.00
+Apr	85000.00	80000.00
+May	11000.00	85000.00
+Jun	28000.00	11000.00
+
+-- 24.	Find top performer in each sales region. 
+
+SELECT emp_name,
+       region,
+       sales
+FROM (
+    SELECT emp_name,
+           region,
+           sales,
+           RANK() OVER (
+               PARTITION BY region
+               ORDER BY sales DESC
+           ) AS rnk
+    FROM SalesTeam
+) AS ranked_sales
+WHERE rnk = 1;
+
+output
+
+Priya	East	75000.00
+John	North	95000.00
+Bala	South	90000.00
+Kavin	West	92000.00
+
+-- 25.	Assign row numbers to duplicate customer records. 
+
+SELECT customer_id,
+       customer_name,
+       email,
+       city,
+       ROW_NUMBER() OVER (
+           PARTITION BY customer_name, email
+           ORDER BY customer_id
+       ) AS row_num
+FROM Customers;
+
+output
+
+8	Arun	arun@gmail.com	Salem	 1
+3	Divya	divya@gmail.com	Madurai	 1
+2	Kumar	kumar@gmail.com	Chennai	 1
+1	Raj	raj@gmail.com	Madurai	     1
+7	Rani	rani@gmail.com	Madurai	 1
+5	Sneha	sneha@gmail.com	Trichy	 1
+6	Vijay	vijay@gmail.com	Chennai	 1
+
+
+-- 26.	Create an index to improve employee name search performance. 
+CREATE INDEX idx_emp_name
+ON Employees(emp_name);
+
+SHOW INDEX FROM Employees;
+
+SELECT *
+FROM Employees
+WHERE emp_name = 'Arun';
+
+output
+
+employees	0	PRIMARY      	1	 emp_id	    A	10		    BTREE			    YES	
+employees	1	idx_emp_name	1	emp_name	A	10			YES	BTREE			YES	
+
+-- 27.	Improve query performance on large sales table using indexing. 
+
+
+CREATE INDEX idx_order_date
+ON Sales(order_date);      -- (frequent search by order_date)
+
+SHOW INDEX FROM Sales;
+
+SELECT *
+FROM Sales
+WHERE order_date = '2025-03-01';
+
+
+CREATE INDEX idx_product_id
+ON Sales(product_id);     -- (Frequent search by  product_id) 
+
+SELECT *
+FROM Sales
+WHERE product_id = 202;
+
+output
+
+sales	0	PRIMARY	        1	sale_id	    A	12				BTREE			YES	
+sales	1	idx_order_date	1	order_date	A	12			YES	BTREE			YES	
+sales	1	idx_product_id	1	product_id	A	5			YES	BTREE			YES	
+
+-- 28.	Use CTE to fetch employees with salary greater than 50,000. 
+
+WITH HighSalaryEmployees AS (
+    SELECT emp_id,
+           emp_name,
+           salary
+    FROM Employees
+    WHERE salary > 50000
+)
+SELECT *
+FROM HighSalaryEmployees;
+
+output
+
+101	Arun	55000.00
+102	Bala	60000.00
+105	Asha	70000.00
+107	Kavin	80000.00
+108	Meena	65000.00
+109	Priya	60000.00
+110	Ravi	80000.00
+
+-- 29.	Create an index on customer email for faster lookup. 
+
+
+CREATE INDEX idx_customer_email
+ON Customers(email);
+
+SHOW INDEX FROM Customers;
+
+SELECT *
+FROM Customers
+WHERE email = 'raj@gmail.com';
+
+output
+
+customers	0	PRIMARY	            1	customer_id	  A	   8				   BTREE		
+customers	1	idx_customer_email	1	email	      A	   7			YES	   BTREE		
+
+
+-- 30.	Extract today’s sales report automatically. 
+
+SELECT *
+FROM Sales
+WHERE order_date = CURDATE();
+
+output
+
+no output
+
+Since there is no record for the current date in table, the output is empty
+
+
+-- 31.	Generate total sales report from the Sales table. 
+SELECT SUM(amount) AS total_sales
+FROM Sales;
+
+output
+
+323000.00
+
+-- 32.	Remove duplicate customer records keeping one record. 
+DELETE c1
+FROM Customers c1
+JOIN Customers c2
+ON c1.customer_name = c2.customer_name
+AND c1.email = c2.email
+AND c1.customer_id > c2.customer_id;     -- (If we don't  know the duplicate record )
+
+
+DELETE FROM Customers
+WHERE customer_id = 4;     -- (it directly finds the record and delete the record)
+
+select * from customers;
+
+
+output
+1	Raj	raj@gmail.com	Madurai
+2	Kumar	kumar@gmail.com	Chennai
+3	Divya	divya@gmail.com	Madurai
+5	Sneha	sneha@gmail.com	Trichy
+6	Vijay	vijay@gmail.com	Chennai
+7	Rani	rani@gmail.com	Madurai
+8	Arun	arun@gmail.com	Salem
+
+
+duplicate record for raj(4) deleted from the original table
+
+-- 33.	Join Customers, Orders, and Products tables. 
+
+SELECT c.customer_name,
+       p.product_name,
+       o.order_date,
+       o.quantity
+FROM Customers c
+INNER JOIN Orders o
+ON c.customer_id = o.customer_id
+INNER JOIN Products p
+ON o.product_id = p.product_id;
+
+output
+
+Raj	      Laptop	2025-01-10	1
+Kumar	  Mobile	2025-01-15	2
+Raj	     Shoes	    2025-02-05	3
+Divya	  Watch	    2025-02-12	1
+
+-- 34.	Generate monthly sales report. 
+
+
+SELECT MONTHNAME(order_date) AS month,
+       SUM(amount) AS total_sales
+FROM Sales
+GROUP BY MONTH(order_date), MONTHNAME(order_date)
+ORDER BY MONTH(order_date);
+
+output
+
+January	       105000.00
+February	   14000.00
+March	       80000.00
+April	       85000.00
+May	           11000.00
+June	       28000.00
+
+
+-- 35.	Find highest-selling product based on number of orders.
+select p.product_name,count(o.order_id)as total_orders
+ from orders o join
+products p on o.product_id=p.product_id
+group by p.product_name 
+order by total_orders desc
+limit 1;                                        -- (Since all products in our sample data have only 1 order
+                                                --  each, any one of them may appear as the result.
+
+
+
+output
+
+Laptop	1
+
+
+			
 
 
 
