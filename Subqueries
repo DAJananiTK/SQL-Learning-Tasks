@@ -1,0 +1,288 @@
+use sql_company_db;
+-- Single Row Subquery Questions 
+ -- 1.	Find employees whose salary is greater than the average salary of all employees.
+ SELECT emp_id,
+       emp_name,
+       salary
+FROM Employees
+WHERE salary >
+(
+    SELECT AVG(salary)
+    FROM Employees
+);
+
+
+-- 2.	Find employees who earn more than Ravi.
+
+SELECT emp_id,
+       emp_name,
+       salary
+FROM Employees
+WHERE salary >=
+(
+    SELECT salary
+    FROM Employees
+    WHERE emp_name = 'Ravi'
+);
+
+-- 3.	Find employees who joined after Meena.
+
+SELECT *
+FROM Employees
+WHERE join_date >                    -- ( I added a column join_date in the employees table)
+(
+    SELECT join_date
+    FROM Employees
+    WHERE emp_name = 'Meena'
+);
+
+
+-- 4.	Find employees whose salary is greater than the average salary of the IT department.
+SELECT emp_id,
+       emp_name,
+       salary                 
+FROM Employees
+WHERE salary >
+(
+    SELECT AVG(salary)
+    FROM Employees
+    WHERE dept_id = 2
+);
+
+
+-- 5.	Find employees whose performance rating is higher than the average performance rating of all employees.
+SELECT emp_id,
+       emp_name,
+       performance_rating
+FROM Employees
+WHERE performance_rating >                     -- (I added the performance rating column) 
+(
+    SELECT AVG(performance_rating)
+    FROM Employees
+);
+
+
+-- Multi Row Subquery Questions 
+-- 1.	Find employees who work in departments located in Chennai or Bangalore.
+
+SELECT e.emp_id,
+       e.emp_name,
+       d.dept_name,
+       d.location
+FROM Employees e
+JOIN Departments d
+ON e.dept_id = d.dept_id
+WHERE e.dept_id IN
+(
+    SELECT dept_id
+    FROM Departments
+    WHERE location IN ('Chennai', 'Bangalore')
+);
+
+-- 2.	Find employees who work in departments located in Pune.
+
+
+SELECT e.emp_id,
+       e.emp_name,
+       d.dept_name,
+       d.location
+FROM Employees e
+JOIN Departments d                        -- (in our table there is no location called pune)
+ON e.dept_id = d.dept_id
+WHERE e.dept_id IN
+(
+    SELECT dept_id                    
+    FROM Departments
+    WHERE location = 'Pune'
+);
+
+-- 3.	Find employees whose salary is greater than any employee in the Marketing department.
+
+SELECT emp_id,
+       emp_name,
+       salary
+FROM Employees
+WHERE salary > ANY
+(
+    SELECT salary
+    FROM Employees
+    WHERE dept_id =
+    (
+        SELECT dept_id
+        FROM Departments
+        WHERE dept_name = 'Marketing'
+    )
+);
+select * from employees;
+select * from departments;
+
+-- 4.	Find employees whose salary is greater than all employees in the HR department.
+SELECT emp_id,
+       emp_name,
+       salary
+FROM Employees
+WHERE salary > ALL
+(
+    SELECT salary
+    FROM Employees
+    WHERE dept_id =
+    (
+        SELECT dept_id
+        FROM Departments
+        WHERE dept_name = 'HR'
+    )
+);
+-- 5.	Find employees who belong to departments that have employees with performance rating = 5.
+SELECT emp_id,
+       emp_name,
+       dept_id,
+       performance_rating
+FROM Employees
+WHERE dept_id IN  
+(                                    -- (no output because 5 rating is not there in table)
+    SELECT dept_id
+    FROM Employees
+    WHERE performance_rating =5
+);
+
+
+-- Correlated Subquery Questions 
+
+-- 1.	Find employees whose salary is greater than the average salary of their department.
+SELECT emp_id,
+       emp_name,
+       dept_id,
+       salary
+FROM Employees e
+WHERE salary >
+(
+    SELECT AVG(salary)
+    FROM Employees
+    WHERE dept_id = e.dept_id
+);
+
+-- 2.	Find employees who earn the highest salary in their department.
+select emp_id,
+emp_name,
+dept_id,
+salary from 
+employees e
+where salary=
+(
+select max(salary) from employees where dept_id=e.dept_id 
+);
+select * from employees;
+
+-- 3.	Find employees whose performance rating is higher than the average performance rating in their department.
+SELECT emp_id,
+       emp_name,
+       dept_id,
+       performance_rating
+FROM Employees e
+WHERE performance_rating >
+(
+    SELECT AVG(performance_rating)
+    FROM Employees
+    WHERE dept_id = e.dept_id
+);
+
+
+-- 4.	Find employees who joined after the average join date of their department.
+SELECT emp_id,
+       emp_name,
+       dept_id,
+       join_date
+FROM Employees e
+WHERE join_date >
+(
+    SELECT AVG(join_date)
+    FROM Employees
+    WHERE dept_id = e.dept_id
+);
+
+-- 5.	Find employees whose salary is less than the maximum salary in their department.
+
+SELECT emp_id,
+       emp_name,
+       dept_id,
+       salary
+FROM Employees e
+WHERE salary <
+(
+    SELECT MAX(salary)
+    FROM Employees
+    WHERE dept_id = e.dept_id
+);
+
+
+-- 6.	Find employees whose salary is equal to the minimum salary in their department.
+
+SELECT emp_id,
+       emp_name,
+       dept_id,
+       salary
+FROM Employees e
+WHERE salary =
+(
+    SELECT MIN(salary)
+    FROM Employees
+    WHERE dept_id = e.dept_id
+);
+
+-- 7.	Find departments that have employees earning more than 70000.
+SELECT dept_id,
+       dept_name
+FROM Departments d
+WHERE EXISTS
+(
+    SELECT 1                              
+    FROM Employees e
+    WHERE e.dept_id = d.dept_id
+      AND e.salary > 70000
+);
+
+
+
+-- 8.	Find employees whose salary is greater than at least one employee in their department.
+-- > ANY = greater than at least one value
+-- > ALL = greater than every value
+
+SELECT emp_id,
+       emp_name,
+       dept_id,
+       salary
+FROM Employees e
+WHERE salary > ANY
+(
+    SELECT salary
+    FROM Employees
+    WHERE dept_id = e.dept_id
+);
+
+-- 9.	Find employees who are the only employee in their department
+SELECT emp_id,
+       emp_name,
+       dept_id
+FROM Employees e
+WHERE 1 =
+(
+    SELECT COUNT(*)
+    FROM Employees
+    WHERE dept_id = e.dept_id
+);
+
+
+-- 10.	Find employees whose salary is greater than the average salary of employees who joined after them.
+
+SELECT emp_id,
+       emp_name,
+       salary,
+       join_date
+FROM Employees e
+WHERE salary >
+(
+    SELECT AVG(salary)
+    FROM Employees
+    WHERE join_date > e.join_date
+);
+select * from employees;
